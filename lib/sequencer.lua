@@ -172,6 +172,13 @@ function sequencer:resetStageIndex(trackIndex)
         self.stageIndex[trackIndex] = track.loop.stop
     elseif track.playbackOrder == 'alternate' then
         self.stageIndex[trackIndex] = track.loop.start
+    elseif track.playbackOrder == 'brownian' then
+        -- wrap around: past end -> start, past start -> end
+        if self.stageIndex[trackIndex] > track.loop.stop then
+            self.stageIndex[trackIndex] = track.loop.start
+        else
+            self.stageIndex[trackIndex] = track.loop.stop
+        end
     end
 end
 
@@ -246,6 +253,15 @@ function sequencer:prepareNextPulse(trackIndex, pulse)
 
         elseif track.playbackOrder == 'random' then
             self:advanceToNextStage(trackIndex)
+
+        elseif track.playbackOrder == 'brownian' then
+            local roll = math.random()
+            if roll < 0.5 then
+                self:advanceToNextStage(trackIndex, 1)
+            elseif roll < 0.75 then
+                self:advanceToNextStage(trackIndex, -1)
+            end
+            -- else: stay on current stage (25%)
         end
 
         local transposeTrigger = self:getTransposeTrigger(trackIndex);
@@ -380,6 +396,16 @@ end
 function sequencer:noteOn(trackIndex, pulse)
     if self:shouldSendToOutput(trackIndex, 'midi') then
         local midiCh = params:get('midi_ch_tr_' .. trackIndex)
+
+        if pulse.slideAmount > 0 then
+            m:cc(65, 127, midiCh) -- portamento on
+            local clamped = math.min(pulse.slideAmount, 1.1)
+            local portamentoTime = util.round(util.linlin(0, 1.1, 0, 127, clamped))
+            m:cc(5, portamentoTime, midiCh) -- portamento time
+        else
+            m:cc(65, 0, midiCh) -- portamento off
+        end
+
         m:note_on(pulse.midiNote, 100, midiCh)
     end
 

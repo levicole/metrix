@@ -648,16 +648,10 @@ function drawTrackOptions()
 
         -- rows 12 & 15: playback orders
         for x = 1, #playbackOrders do
-            g:led(x, y, ledLevels.low)
-
-            if track.playbackOrder == playbackOrders[1] and x == 1 then
+            if track.playbackOrder == playbackOrders[x] then
                 g:led(x, y, ledLevels.high)
-            elseif track.playbackOrder == playbackOrders[2] and x == 2 then
-                g:led(x, y, ledLevels.high)
-            elseif track.playbackOrder == playbackOrders[3] and x == 3 then
-                g:led(x, y, ledLevels.high)
-            elseif track.playbackOrder == playbackOrders[4] and x == 4 then
-                g:led(x, y, ledLevels.high)
+            else
+                g:led(x, y, ledLevels.low)
             end
         end
         y = y + 1
@@ -862,7 +856,7 @@ function g.key(x, y, z)
         end
 
         -- rows 10 & 13: playback order
-        if (y == 10 or y == 13) and x <= 4 then
+        if (y == 10 or y == 13) and x <= #track.getPlaybackOrders() then
             local trackIndex = 1
             if y == 13 then
                 trackIndex = 2

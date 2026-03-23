@@ -4,7 +4,7 @@ stage = include('lib/stage')
 local track = {}
 
 local divisions = {1 / 1, 1 / 2, 3 / 8, 1 / 4, 3 / 16, 1 / 8, 1 / 16, 1 / 32}
-local playbackOrders = {'forward', 'reverse', 'alternate', 'random'}
+local playbackOrders = {'forward', 'reverse', 'alternate', 'random', 'brownian'}
 
 function track:new(args)
     local t = setmetatable({}, {
@@ -46,7 +46,7 @@ end
 function track:randomize(paramNames)
     for i, name in ipairs(paramNames) do
         if name == 'playbackOrder' then
-            self.playbackOrder = playbackOrders[math.random(1, 4)]
+            self.playbackOrder = playbackOrders[math.random(1, #playbackOrders)]
         end
         if name == 'division' then
             self.division = divisions[math.random(1, 8)]
@@ -250,6 +250,8 @@ function track:getPlaybackOrderSymbol()
         short = '< >'
     elseif self.playbackOrder == 'random' then
         short = '?'
+    elseif self.playbackOrder == 'brownian' then
+        short = '~'
     end
 
     return short
