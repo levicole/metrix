@@ -357,6 +357,7 @@ function redrawGrid()
     if selectedPage == 1 then
         if shiftIsHeld() then
             drawMatrix('ratchetCount', {8, 7, 6, 5, 4, 3, 2, 1}, 3, 10, true)
+            drawBooleanMatrix('accent', 11)
             drawMatrix('probability', stage:getProbabilities(), 12, 15)
             -- drawMatrix('gateLength', stage:getGateLengths(), 12, 15)
         else
@@ -799,6 +800,8 @@ function g.key(x, y, z)
                 local pulseCount = 11 - y
                 setParam(stage, 'pulseCount', pulseCount)
             end
+        elseif y == 11 and shiftIsHeld() then
+            stage:toggleParam('accent')
         elseif y >= 12 and y <= 15 then
             if shiftIsHeld() then
                 local probabilities = stage:getProbabilities()
@@ -911,7 +914,7 @@ function g.key(x, y, z)
     if on and y == 16 and x <= maxPages then
         if modIsHeld() and shiftIsHeld() then
             if x == 1 then
-                track:randomize({'pulseCount', 'ratchetCount', 'gateType', 'probability'})
+                track:randomize({'pulseCount', 'ratchetCount', 'gateType', 'probability', 'accent'})
             elseif x == 2 then
                 track:randomize({'pitch', 'transposeAmount', 'octave', 'slide', 'transposeDirection'})
             end

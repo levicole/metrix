@@ -415,7 +415,8 @@ function sequencer:noteOn(trackIndex, pulse)
                 m:cc(65, 0, midiCh) -- portamento off
             end
         end
-        m:note_on(pulse.midiNote, 100, midiCh)
+        local velocity = pulse.accent and 127 or 100
+        m:note_on(pulse.midiNote, velocity, midiCh)
     end
 
     if self:shouldSendToOutput(trackIndex, 'crow') then

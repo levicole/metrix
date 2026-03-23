@@ -60,7 +60,7 @@ end
 
 function track:randomizeAll()
     self:randomize({'pulseCount', 'ratchetCount', 'gateType', 'probability', 'pitch', 'transposeAmount', 'octave',
-                    'slide', 'transpositionDirection'})
+                    'slide', 'transpositionDirection', 'accent'})
 end
 
 function track:setLoop(start, stop)
@@ -130,6 +130,7 @@ function track:getPulse(trackIndex, stageIndex, pulseCount)
         gateLength = stage.gateLength,
         probability = stage.probability,
         ratchetCount = stage.ratchetCount,
+        accent = stage.accent,
         first = first,
         last = last,
         duration = 1,
