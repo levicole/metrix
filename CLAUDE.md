@@ -23,13 +23,14 @@ lib/math.lua        -- math.lowerRandom (biased random)
 - **Ratchets**: subdivide a pulse into rapid repeated triggers (1-8 per pulse).
 - **Accumulator/transposition**: each stage can shift pitch up/down by a configurable amount, triggered per stage/pulse/ratchet.
 - **Probability**: per-stage chance of playing (1, 0.75, 0.5, 0.25).
-- **Slide**: portamento between notes (0-5 seconds via params).
+- **Slide**: portamento between notes (0-5 seconds via params). Per-track MIDI slide type: cascadia (CC#65/CC#5 portamento) or overlap (extends gate for legato).
+- **Playback orders**: forward, reverse, alternate, random, brownian (weighted random walk: 50% forward, 25% back, 25% stay).
 
 ## Output Routing
 
 Each track can independently output to:
 - **Audio** (MollyThePoly engine)
-- **MIDI** (configurable channel, portamento via CC#65/CC#5)
+- **MIDI** (configurable channel, per-track slide type: cascadia or overlap)
 - **Crow** (outputs 1/3 = gate/trigger/envelope, outputs 2/4 = 1V/oct pitch)
 
 ## Grid Pages
@@ -53,7 +54,6 @@ Each track can independently output to:
 
 - **Mod lanes** (8 independent modulation sequencers - the big one)
 - Swing/groove
-- Brownian playback order
 - Per-stage velocity (currently hardcoded: MIDI=100, audio=1)
 - Assignable AUX outputs (A/B)
 - Preset chaining
@@ -64,7 +64,7 @@ Each track can independently output to:
 
 ## Development Notes
 
-- The `sequencer.lua` file has an uncommitted change adding MIDI portamento CC control
 - Slide for audio engine is global (MollyThePoly limitation), not per-track
 - Gate lengths are partially implemented (values exist in stage but not fully wired)
 - Preset system uses `tab.save`/`tab.load` with flat key serialization
+- Playback order grid UI and input handling are dynamic (adding new orders only requires updating the `playbackOrders` table in track.lua)

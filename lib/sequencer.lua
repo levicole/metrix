@@ -330,6 +330,13 @@ function sequencer:playNote(trackIndex, pulse)
             local ppqnPulseLength = pulse.gateLength * ppqnPerWhole * division * pulse.duration
             local ppqnNoteOff = transport + ppqnPulseLength
 
+            -- overlap slide: extend gate to overlap with next note-on for legato
+            local midiSlideType = params:get('midi_slide_type_tr_' .. trackIndex)
+            if midiSlideType == 2 and pulse.slideAmount > 0 and self:shouldSendToOutput(trackIndex, 'midi') then
+                local ppqnNextPulse = ppqnPerWhole * division * pulse.duration
+                ppqnNoteOff = transport + ppqnNextPulse + 2
+            end
+
             self:addEvent('noteOff', pulse, trackIndex, ppqnNoteOff)
             self:noteOn(trackIndex, pulse)
         end
@@ -396,16 +403,18 @@ end
 function sequencer:noteOn(trackIndex, pulse)
     if self:shouldSendToOutput(trackIndex, 'midi') then
         local midiCh = params:get('midi_ch_tr_' .. trackIndex)
+        local midiSlideType = params:get('midi_slide_type_tr_' .. trackIndex)
 
-        if pulse.slideAmount > 0 then
-            m:cc(65, 127, midiCh) -- portamento on
-            local clamped = math.min(pulse.slideAmount, 1.1)
-            local portamentoTime = util.round(util.linlin(0, 1.1, 0, 127, clamped))
-            m:cc(5, portamentoTime, midiCh) -- portamento time
-        else
-            m:cc(65, 0, midiCh) -- portamento off
+        if midiSlideType == 1 then -- cascadia
+            if pulse.slideAmount > 0 then
+                m:cc(65, 127, midiCh) -- portamento on
+                local clamped = math.min(pulse.slideAmount, 1.1)
+                local portamentoTime = util.round(util.linlin(0, 1.1, 0, 127, clamped))
+                m:cc(5, portamentoTime, midiCh) -- portamento time
+            else
+                m:cc(65, 0, midiCh) -- portamento off
+            end
         end
-
         m:note_on(pulse.midiNote, 100, midiCh)
     end
 
