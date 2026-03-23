@@ -17,20 +17,8 @@ include('lib/helpers')
 
 m = midi.connect()
 
--- manual grid rotation
-function grid:led(x, y, val)
-    _norns.grid_set_led(self.dev, y, 9 - x, val)
-end
-
--- restore default rotation on script clear
-function cleanup()
-  function grid:led(x, y, val)
-    _norns.grid_set_led(self.dev, x, y, val)
-  end
-end
-
 g = grid.connect()
-
+g:rotation(1)
 -- molly the poly
 MollyThePoly = require "molly_the_poly/lib/molly_the_poly_engine"
 engine.name = "MollyThePoly"
@@ -721,10 +709,6 @@ function enc(n, d)
 end
 
 function g.key(x, y, z)
-    -- manual grid rotation
-    local tempX, tempY = x, y
-    x = 9 - tempY
-    y = tempX
 
     local on, off = z == 1, z == 0
     local track = seq:getCurrentTrack()
